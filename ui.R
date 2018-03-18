@@ -8,23 +8,21 @@
 #
 
 library(shiny)
+library(plotly)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
   
-  # Application title
-  titlePanel("NHL Data"),
-  
-  
   # Sidebar with a slider input for number of bins 
-  sidebarLayout(
+  sidebarLayout(  fluid = TRUE,
     sidebarPanel(
-       numericInput(inputId = "GameID", label = "Enter Game ID", value = 10)
+       numericInput(inputId = "GameID", label = "Enter Game ID", value = 10), width = 3,
+       tableOutput("TeamStats")
     ),
-    
     # Show a plot of the generated distribution
     mainPanel(
-       plotlyOutput("NHLPLot")
+      plotlyOutput("NHLPLot", height = 200), div(dataTableOutput("PlaySummary"), style = "font-size: 75%; height: 75%"), fluid = TRUE
     )
   )
 ))
+
