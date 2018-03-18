@@ -5,7 +5,6 @@
 # Find out more about building applications with Shiny here:
 # 
 #    http://shiny.rstudio.com/
-library(ggimage)
 library(shiny)
 library(png)
 library(raster)
@@ -29,7 +28,7 @@ shinyServer(function(input, output, session) {
   
   plays = reactive({
     invalidateLater(10000, session)
-    gameID <- 2017021095#input$GameID
+    gameID <- input$GameID
     gameData <- jsonlite::fromJSON(rawToChar(httr::GET(url = paste("http://statsapi.web.nhl.com/api/v1/game/", gameID, "/feed/live", sep = ""))$content))
     PBP <- gameData$liveData$plays$allPlays
     PBP <- flatten(PBP)
@@ -37,21 +36,23 @@ shinyServer(function(input, output, session) {
   
   
   output$NHLPLot <- renderPlotly({
-    invalidateLater(10000, session)
     PBP <- plays()
     pbpfilter <- PBP[!is.na(PBP$team.triCode),]
     modifiedCoords <- pbpfilter$coordinates.x * (2*(pbpfilter$about.period %% 2) - 1)
     p <- ggplot( data = pbpfilter, aes(x = modifiedCoords, y = pbpfilter$coordinates.y)) + annotation_raster(rink, -100, 100, -42.5, 42.5, interpolate=FALSE) +
     geom_point(aes(color = pbpfilter$team.triCode, shape = pbpfilter$result.event), size = 2) +
       scale_shape_manual(values = c(7, 13, 3, 11, 20, 21, 22, 23, 24, 25)) +  
-      theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank())
-    ggplotly(p, height = 200)
+      theme(legend.title=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank()) +
+      theme(legend.position = "bottom", legend.text = element_text(size = 5)) + theme(legend.key = element_rect(colour = "blue"))
+    p <- ggplotly(p)
+    p
   })
   
   output$PlaySummary <- renderDataTable({
     PBP <- plays()
     w <- data.frame(PBP$about.periodTimeRemaining, PBP$team.triCode, PBP$result.event, PBP$result.description)
-    datatable(w, options = list(dom = 't'))
+    w<-w[dim(w)[1]:1,]
+    datatable(w, options = list(dom = 'tp'))
   })
   
   output$TeamStats <- renderTable({
