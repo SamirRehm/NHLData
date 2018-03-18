@@ -27,19 +27,43 @@
 #))
 
 library(shinydashboard)
+library(shiny)
+library(plotly)
 
 dashboardPage(
-  dashboardHeader(),
-  dashboardSidebar(),
+  dashboardHeader(
+    # Set height of dashboardHeader
+    tags$li(class = "dropdown",
+            tags$style(".main-header {max-height: 20px}"),
+            tags$style(".main-header .logo {height: 20px;}"),
+            tags$style(".sidebar-toggle {height: 20px; padding-top: 1px !important;}"),
+            tags$style(".navbar {min-height:20px !important}")
+    ) 
+  ),
+  dashboardSidebar(
+    # Adjust the sidebar
+    tags$style(".left-side, .main-sidebar {padding-top: 20px}"),
+    sidebarMenu(
+      numericInput(inputId = "GameID", label = "Enter Game ID", value = 10),
+      checkboxGroupInput("plotVars", "On Ice Variables:",
+                         c("Goals" = "Goal",
+                           "Shots" = "Shot",
+                           "Hits" = "Hit",
+                           "Penalties" = "Penalty",
+                           "Faceoffs" = "Faceoff",
+                           "Blocks" = "Blocked Shot",
+                           "Misses" = "Missed Shot",
+                           "Takeaways" = "Takeaway",
+                           "Giveaways" = "Giveaway")), width = 3
+    )
+  ),
   dashboardBody(
     fluidRow(
-      box(plotlyOutput("NHLPLot")),
+      column( width = 3,
+             box(tableOutput("TeamStats"), width = 12)
+             ),
+      column(width = 9, box(plotlyOutput("NHLPLot", height = 300), width = 12), box(dataTableOutput("PlaySummary"), width = 12))
       
-      box(
-        title = "Controls",
-        numericInput(inputId = "GameID", label = "Enter Game ID", value = 10)
-      )
-    
   )
 )
 )
