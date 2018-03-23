@@ -29,6 +29,7 @@
 library(shinydashboard)
 library(shiny)
 library(plotly)
+library(DT)
 
 dashboardPage(
   dashboardHeader(
@@ -43,6 +44,9 @@ dashboardPage(
   dashboardSidebar(
     # Adjust the sidebar
     tags$style(".left-side, .main-sidebar {padding-top: 20px}"),
+    uiOutput("audiotag"),
+    #tags$audio(src = "a.mp3", type = "audio/wav", autoplay = NA),
+    #output$audiotag<-renderUI(get_audio_tag("tempwav.wav")), #starting wave file 
     sidebarMenu(
       numericInput(inputId = "GameID", label = "Enter Game ID", value = 10),
       checkboxGroupInput("plotVars", "On Ice Variables:",
@@ -60,7 +64,9 @@ dashboardPage(
   dashboardBody(
     fluidRow(
       column( width = 3,
-             box(tableOutput("TeamStats"), width = 12)
+              box(htmlOutput("picture")),
+              box(htmlOutput("picture2")),
+             box(div(tableOutput("TeamStats"), style = "font-size: 82%"), width = 12)
              ),
       column(width = 9, box(plotlyOutput("NHLPLot", height = 300), width = 12), box(dataTableOutput("PlaySummary"), width = 12))
       
