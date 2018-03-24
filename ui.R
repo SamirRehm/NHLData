@@ -68,7 +68,9 @@ dashboardPage(
               box(htmlOutput("picture2")),
              box(div(tableOutput("TeamStats"), style = "font-size: 82%"), width = 12)
              ),
-      column(width = 9, box(plotlyOutput("NHLPLot", height = 300), width = 12), box(dataTableOutput("PlaySummary"), width = 12))
+      column(width = 9, box(plotlyOutput("NHLPLot", height = 300), width = 12),
+             box(htmlOutput("Player"), width = 12),
+             box(dataTableOutput("PlaySummary"), width = 12))
       
   )
 )

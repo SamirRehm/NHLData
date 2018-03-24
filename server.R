@@ -106,4 +106,22 @@ shinyServer(function(input, output, session) {
     y <- plyr::rename(y, c("x.Var1" = "Stat", "x.Freq" = teams[[1]], "x.Freq.1" = teams[[2]]))
     y
   })
+  
+  output$Player <- renderText({
+    PBP <- plays()$boxscore$teams$home$onIcePlus$playerId
+    homeplayers <- ""
+    if(length(PBP) > 0) {
+      for(i in 1:length(PBP)) {
+        homeplayers <- paste(homeplayers, "<img height = 54 src='https://nhl.bamcontent.com/images/headshots/current/168x168/", PBP[[i]], ".jpg'src>", sep = "")
+      }
+    }
+    PBP <- plays()$boxscore$teams$away$onIcePlus$playerId
+    if(length(PBP) > 0) {
+      for(i in 1:length(PBP)) {
+        homeplayers <- paste(homeplayers, "<img height = 54 src='https://nhl.bamcontent.com/images/headshots/current/168x168/", PBP[[length(PBP) - i + 1]], ".jpg'src>", sep = "")
+      }
+    }
+    
+    homeplayers
+  })
 })
