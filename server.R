@@ -26,12 +26,32 @@ shinyServer(function(input, output, session) {
   get_audio_tag<-function(filename){tags$audio(src = filename,
                                                type ="audio/wav", autoplay = NA)}
   
-  observe({
+  observeEvent(input$Season, {
     seasonResponse <- jsonlite::fromJSON(rawToChar(httr::GET(url = paste("http://live.nhl.com/GameData/SeasonSchedule-", input$Season, ".json", sep = ""))$content))
+    updateSelectInput(session, "Team", label = "Select a team", choices = unique(sort(c(seasonResponse$a) ) ))
+    if(input$Team == "") {
     updateSelectInput(session, "GameNumber",
                       label = paste("Select a game"),
                       choices = paste(seasonResponse$id, seasonResponse$a, "at", seasonResponse$h, seasonResponse$est))
-    updateSelectInput(session, "Team", label = "Select a team", choices = unique(seasonResponse$a))
+    }
+    else {
+      seasonResponse <- seasonResponse[(seasonResponse$a == input$Team), ]
+      updateSelectInput(session, "GameNumber",
+                        label = paste("Select a game"),
+                        choices = paste(seasonResponse$id, seasonResponse$a, "at", seasonResponse$h, seasonResponse$est))
+    }
+  })
+  
+  observeEvent(input$Team, {
+    seasonResponse <- jsonlite::fromJSON(rawToChar(httr::GET(url = paste("http://live.nhl.com/GameData/SeasonSchedule-", input$Season, ".json", sep = ""))$content))
+      seasonResponse <- seasonResponse[((seasonResponse$a == input$Team) | (seasonResponse$h == input$Team)), ]
+      updateSelectInput(session, "GameNumber",
+                        label = paste("Select a game"),
+                        choices = paste(seasonResponse$id, seasonResponse$a, "at", seasonResponse$h, seasonResponse$est))
+  })
+  
+  reactive({
+    
   })
   
   wave_name<-function(){
@@ -48,9 +68,9 @@ shinyServer(function(input, output, session) {
     
     if(input$GameNumber != gameID) {
       src = paste("//www-league.nhlstatic.com/nhl.com/builds/site-core/33f4bcacaa52eed691a6f0671c4cde69850f3c31_1521478002/images/logos/team/current/team-", gameData$gameData$teams$home$id,"-dark.svg", sep="")
-      output$picture<-renderText({c('<img src="',src,'">')})
+      output$picture<-renderText({c('<img src="',src,'", width = 100, height = 100>')})
       src2 = paste("//www-league.nhlstatic.com/nhl.com/builds/site-core/33f4bcacaa52eed691a6f0671c4cde69850f3c31_1521478002/images/logos/team/current/team-", gameData$gameData$teams$away$id ,"-dark.svg", sep="")
-      output$picture2<-renderText({c('<img src="',src2,'">')})
+      output$picture2<-renderText({c('<img src="',src2,'", width = 100, height = 100>')})
     }
     if(as.numeric(difftime(Sys.time(), lastGoalTime, units = 'secs')) > 15 && length(gameData)>2) {
       #need to fix this for when you aren't in a game
@@ -224,7 +244,12 @@ shinyServer(function(input, output, session) {
     homeplayers <- ""
     if(length(PBP) > 0) {
       for(i in 1:length(PBP)) {
-        homeplayers <- paste(homeplayers, "<img height = 54 src='https://nhl.bamcontent.com/images/headshots/current/168x168/", PBP[[i]], ".jpg'src>", sep = "")
+        homeplayers <- paste(homeplayers, "<div class=\"ext-box\">
+    <div class=\"int-box\">
+                             <h2>Some txt</h2>", "<img height = 54 src='https://nhl.bamcontent.com/images/headshots/current/168x168/", PBP[[i]], ".jpg'src>33",
+                             "<p>bla bla bla</p>
+                             </div>
+                             </div>", sep = "")
       }
     }
     PBP <- plays()$boxscore$teams$away$onIcePlus$playerId

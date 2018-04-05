@@ -52,7 +52,7 @@ dashboardPage(
       selectizeInput(inputId = "Team", label = "Select a team", choices = c()),
       
       selectizeInput(inputId = "GameNumber", label = "Select a game", choices = c(), options = list(maxOptions = 2000)),
-      numericInput(inputId = "Refresh", label = "Refresh Rate", value = 10),
+      sliderInput(inputId = "Refresh", label = "Refresh Rate", min = 3, max = 60, value = 5, step = 5),
       checkboxGroupInput("plotVars", "On Ice Variables:",
                          c("Goals" = "Goal",
                            "Shots" = "Shot",
