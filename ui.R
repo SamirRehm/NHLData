@@ -48,7 +48,11 @@ dashboardPage(
     #tags$audio(src = "a.mp3", type = "audio/wav", autoplay = NA),
     #output$audiotag<-renderUI(get_audio_tag("tempwav.wav")), #starting wave file 
     sidebarMenu(
-      numericInput(inputId = "GameID", label = "Enter Game ID", value = 10),
+      selectInput(inputId = "Season", label = "Select a season", choices = c("20172018", "20162017", "20152016")),
+      selectizeInput(inputId = "Team", label = "Select a team", choices = c()),
+      
+      selectizeInput(inputId = "GameNumber", label = "Select a game", choices = c(), options = list(maxOptions = 2000)),
+      numericInput(inputId = "Refresh", label = "Refresh Rate", value = 10),
       checkboxGroupInput("plotVars", "On Ice Variables:",
                          c("Goals" = "Goal",
                            "Shots" = "Shot",
